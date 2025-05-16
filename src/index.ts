@@ -6,6 +6,7 @@ import rootRoute from "./routes/index"
 import authRoute from "./routes/auth/auth.controller"
 import {verifyToken} from "./middleware/auth.middleware"
 import UploadImages from "./routes/upload/imageUpload"
+import Rconnect from "../src/config/radisConnect"
 
 dotenv.config()
 
@@ -17,7 +18,9 @@ app.use(express.json({ limit: '20mb' }));
 app.use(express.urlencoded({ limit: '20mb', extended: true }));
 app.use(cors());
 
-
+Rconnect().then((res)=>{
+    console.log("Radis connected!")
+})
 connectDB().then(()=>{
     app.listen(PORT,()=>{
         console.log(`Server running on port ${PORT}`);
