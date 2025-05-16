@@ -16,6 +16,9 @@ import {
     refrechTokenCheck,
     forgetPasswordCheck
 } from "../../types/user.type"
+import {
+    RadisCline
+} from "../../config/radisConnect"
 
 dotenv.config()
 
@@ -66,7 +69,7 @@ route.post('/login',(req:Request,res:Response)=>{
     })
 })
 
-route.post("/register",(req:Request,res:Response)=>{
+route.post("/register",async(req:Request,res:Response)=>{
     const {
         userName,
         userEmail,
