@@ -19,11 +19,13 @@ import {
 import {
     RadisCline
 } from "../../config/radisConnect"
+import { USER_ROLES, USER_PRIVILLAGES } from "../../utils/privilages"
+import { UserPayload } from "../../model/user.model"
 
 dotenv.config()
 
 const route = Router()
-route.post('/forget_password',(req:Request,res:Response)=>{
+route.post('/forget_password', (req: Request, res: Response) => {
     const {
         userEmail,
         password
@@ -33,26 +35,26 @@ route.post('/forget_password',(req:Request,res:Response)=>{
         password
     }
     const validateData = forgetPasswordCheck.parse(data);
-    forgetPassword(validateData).then((result)=>{
+    forgetPassword(validateData).then((result) => {
         return res.status(200).json(result)
-    }).catch((err)=>{
+    }).catch((err) => {
         res.status(401).json(err)
     })
 })
-route.post('/refresh',(req:Request,res:Response)=>{
-    const {token} = req.body
-    const refreshToken={
-        token:token
+route.post('/refresh', (req: Request, res: Response) => {
+    const { token } = req.body
+    const refreshToken = {
+        token: token
     }
     const validateData = refrechTokenCheck.parse(refreshToken);
-    refreshAccessToken(validateData.token).then((result)=>{
+    refreshAccessToken(validateData.token).then((result) => {
         return res.status(200).json(result)
-    }).catch((err)=>{
+    }).catch((err) => {
         return res.status(501).json(err)
     })
 })
 
-route.post('/login',(req:Request,res:Response)=>{
+route.post('/login', (req: Request, res: Response) => {
     const {
         userEmail,
         password
@@ -62,36 +64,51 @@ route.post('/login',(req:Request,res:Response)=>{
         password
     }
     const validateData = userLoginCheck.parse(loginData)
-    loginUser(validateData).then((result)=>{
+    loginUser(validateData).then((result) => {
         return res.status(200).json(result)
-    }).catch((err)=>{
+    }).catch((err) => {
         return res.status(501).json(err)
     })
 })
 
-route.post("/register",async(req:Request,res:Response)=>{
+route.post("/register", async (req: Request, res: Response) => {
     const {
         userName,
         userEmail,
         userContactNumber,
         userType,
         password,
-        isVerifyed=false
+        isVerifyed = false
     } = req.body
-    const user = {
+    let user:UserPayload = {
         userName,
         userEmail,
         userContactNumber,
         userType,
         password,
-        isVerifyed
+        isVerifyed,
+        privillages:[]
     }
+    let privilages: string[] = []
+    Object.entries(USER_PRIVILLAGES).map(([key, val]) => {
+        if (key.trim().toLowerCase() === userType.trim().toLowerCase()) {
+            privilages = val
+        }
+    })
+    user.privillages = privilages
     const validateUser = userTypeCheck.parse(user)
-    createUser(validateUser).then((result)=>{
+    createUser(validateUser).then((result) => {
         return res.status(200).json(result)
-    }).catch((err)=>{
+    }).catch((err) => {
         return res.status(500).json(err)
     })
+})
+route.get('/privilages', (req: Request, res: Response) => {
+    res.status(200).json({
+        roles: USER_ROLES,
+        privillages: USER_PRIVILLAGES
+    })
+    return
 })
 
 export default route

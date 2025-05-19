@@ -23,12 +23,12 @@ interface User {
     isVerifyed:boolean;
     privillages:string[];
 }
+import { USER_ROLES,USER_PRIVILLAGES } from "../utils/privilages";
 
 export const createUser = (user: User) => {
     return new Promise(async (resolved, rejected) => {
         try {
             const validateUser = userTypeCheck.parse(user)
-
             const newUser = new UserModel({
                 userName: validateUser.userName,
                 userEmail: validateUser.userEmail,

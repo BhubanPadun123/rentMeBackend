@@ -1,6 +1,16 @@
 import mongoose,{Document,Schema} from "mongoose";
 import bcrypt from "bcryptjs"
 
+
+export interface UserPayload{
+    userName:string;
+    userEmail:string;
+    userContactNumber:string;
+    userType:string;
+    password:string;
+    isVerifyed:boolean;
+    privillages:string[]
+}
 export interface User extends Document{
     userName:string;
     userEmail:string;

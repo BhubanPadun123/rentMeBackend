@@ -1,7 +1,8 @@
 import mongoose,{Document,Schema} from "mongoose";
 
 
-export interface BookingPayload{
+export interface BookingPayload {
+    _id?:string;
     vendorRef:string;
     customerRef:string;
     productRef:string;

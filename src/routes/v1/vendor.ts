@@ -7,8 +7,18 @@ import {
     GetVendorProduct
 } from "../../services/v1/productPost.service"
 import {
-    GetVendorBooking
+    GetVendorBooking,
+    CreateOrderStatus
 } from "../../services/v1/order.manage"
+import {
+    bookingConfirmationPayloadCheck
+} from "../../types/vendor.type"
+import {
+    BookingPayload
+} from "../../model/stockBooking.model"
+import {
+    BookingConfirmationPayload
+} from "../../model/bookingConfirmation.model"
 
 
 const router = Router()
@@ -26,12 +36,25 @@ router.get('/vendor/booking',async(req:Request,res:Response)=>{
     const vendorId:string = params.vendorRef as string
     const productRef:string = params.productRef as string
 
-    GetVendorBooking(vendorId,productRef).then((result)=>{
+    GetVendorBooking(vendorId,productRef).then((result:BookingPayload[])=>{
+        let productIds:string[] = []
+        result.length > 0 && result.map((item)=> productIds.push(item.productRef))
         let productList:any = []
+        result.length > 0 && result.map((item)=> {
+            if(item._id){
+                let newOrderStatusData:BookingConfirmationPayload={
+                    bookingRef:item._id,
+                    customerRef:item.customerRef,
+                    vendorRef:item.vendorRef,
+                    productRef:item.productRef,
+                    bookingConfirmationStatus:false
+                }
+            }
+        })
         GetVendorProduct(vendorId).then((result_1)=>{
             if(Array.isArray(result_1) && result_1.length > 0 && Array.isArray(result)){
                 result_1.map((item)=>{
-                    if(result.includes(item.productRef)){
+                    if(productIds.includes(item.productRef)){
                         productList.push(item)
                     }
                 })
@@ -40,7 +63,7 @@ router.get('/vendor/booking',async(req:Request,res:Response)=>{
         }).catch((err)=>{
             return res.status(500).json(err)
         })
-    }).catch((error)=>{
+    }).catch((error:any)=>{
         return res.status(500).json(error)
     })
 })
