@@ -7,7 +7,8 @@ const userTypeCheck = z.object({
     userContactNumber:z.string(),
     userType:z.string(),
     password:z.string().min(6, "Password must be at least 6 characters long"),
-    isVerifyed:z.boolean()
+    isVerifyed:z.boolean(),
+    privillages:z.array(z.string())
 })
 const userLoginCheck = z.object({
     userEmail:z.string().email("Invalid email address"),

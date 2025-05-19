@@ -2,15 +2,15 @@ import {string, z} from "zod"
 
 const productTypeCheck = z.object({
     vendorRef:z.string(),
-    productTitle:z.string().min(6,"Title should not be less than 6").max(100,"Title should not be greater than 100"),
-    productType:z.string().min(4,"product type is mandatory"),
+    productTitle:z.string(),
+    productType:z.string(),
     postAt:z.string(),
     availableStatus:z.boolean(),
     metaData:z.object({
         description:z.string(),
         availableAminities:z.array(z.object({
             name:z.string(),
-            count:z.number()
+            count:z.string()
         })),
         rentInfo:z.object({
             depositeAmount:z.string(),
@@ -33,11 +33,21 @@ const productTypeCheck = z.object({
             url:z.string()
         }))
     }),
-    propertyOccupancy:z.array(z.object({
-        occupancy:z.string()
-    }))
+    propertyOccupancy:z.array(z.string())
+})
+
+const BookingModelCheck = z.object({
+    vendorRef:z.string(),
+    customerRef:z.string(),
+    productRef:z.string(),
+    bookingStatus:z.string(),
+    message:z.string(),
+    rating:z.string(),
+    review:z.string(),
+    bookingDate:z.string()
 })
 
 export {
-    productTypeCheck
+    productTypeCheck,
+    BookingModelCheck
 }

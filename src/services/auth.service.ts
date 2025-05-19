@@ -20,7 +20,8 @@ interface User {
     userContactNumber: string;
     userType: string;
     password: string;
-    isVerifyed:boolean
+    isVerifyed:boolean;
+    privillages:string[];
 }
 
 export const createUser = (user: User) => {
@@ -34,7 +35,8 @@ export const createUser = (user: User) => {
                 userContactNumber: validateUser.userContactNumber,
                 userType: validateUser.userType,
                 password: validateUser.password,
-                isVerifyed: validateUser.isVerifyed
+                isVerifyed: validateUser.isVerifyed,
+                privillages:validateUser.privillages
             })
             const saveUser = await newUser.save()
             resolved({message:"user register successfully!!"})
@@ -143,6 +145,23 @@ export const checkUser=(userEmail:string)=>{
                 message:"error while checking user into DB!!",
                 error
             })
+        }
+    })
+}
+export const GetUserById=(uId:string):User | any=>{
+    return new Promise(async(resolved,rejected)=>{
+        try {
+            const user = await UserModel.findOne({_id:uId})
+            if(user){
+                let userInfo:User = user
+                resolved(userInfo)
+            }else{
+                rejected({
+                    message:`User does not exist with id : ${uId}`
+                })
+            }
+        } catch (error) {
+            rejected(error)
         }
     })
 }

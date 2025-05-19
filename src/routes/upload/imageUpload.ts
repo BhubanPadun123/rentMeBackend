@@ -1,67 +1,47 @@
-import express, {
+import multer from 'multer';
+import {
     Router,
     Request,
     Response
 } from "express"
-import dotenv from "dotenv"
 import {
-    Upload,
     cloudinary
 } from "../../utils/cloudinary/index"
-import fs from "fs"
 
+const storage = multer.diskStorage({
+    destination: "./uploads/",
+    filename: function (req, file, cb) {
+        cb(null, "SomeImage" + "." + file.originalname.split(".").pop());
+    },
+});
 
-dotenv.config()
+const diskStorage = multer({ storage: storage });
 
 const route = Router()
 
-route.post('/images', Upload.array('images', 5), async (req: Request, res: Response): Promise<void> => {
+route.post('/image', diskStorage.single('image'), async (req: Request, res: Response) => {
     try {
-        console.log(req.file,req.files)
-        const files = req.files as Express.Multer.File[];
+        const file = req.file;
 
-        if (!files || files.length === 0) {
-            res.status(400).json({ message: 'No images uploaded' });
-            return;
+        if (!file) {
+            res.status(400).json({ message: 'No image uploaded' });
+            return
         }
 
-        // Upload all images to Cloudinary and delete local files
-        const uploadAllImages = () => {
-            return new Promise<string[]>(async (resolve, reject) => {
-                try {
-                    const urls: string[] = [];
-
-                    for (const file of files) {
-                        const result = await cloudinary.uploader.upload(file.path, {
-                            folder: 'images',
-                        });
-
-                        urls.push(result.secure_url);
-
-                        // Delete the file after uploading
-                        fs.unlink(file.path, (err) => {
-                            if (err) console.error(`Failed to delete ${file.path}:`, err);
-                        });
-                    }
-
-                    resolve(urls);
-                } catch (error) {
-                    reject(error);
-                }
-            });
-        };
-
-        const imageUrls = await uploadAllImages()
-
-        res.status(200).json({
-            message: 'Images uploaded successfully',
-            urls: imageUrls,
+        // Upload to Cloudinary
+        const result = await new Promise((resolve, reject) => {
+            cloudinary.uploader.upload_stream({ folder: 'images' }, (error, result) => {
+                if (error) return reject(error);
+                resolve(result);
+            }).end(file.buffer);
         });
 
+        res.status(200).json({ message: 'Upload successful', result });
     } catch (error) {
-        console.error('Upload error:', error);
-        res.status(500).json({ error: 'Image upload failed' });
+        console.error(error);
+        res.status(500).json({ message: 'Upload failed', error });
     }
 });
+
 
 export default route

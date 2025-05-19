@@ -5,22 +5,63 @@ import express,{
 } from "express"
 import dotenv from "dotenv"
 import { 
-    productTypeCheck 
+    productTypeCheck,
+    BookingModelCheck
 } from "../../types/product.type"
 import {
     checkUser 
 } from "../../services/auth.service"
 import {
-    PostProduct 
+    PostProduct,
+    GetProductList,
+    BookingProperty
 } from "../../services/v1/productPost.service"
 import { ProductPayload } from "../../services/v1/productPost.service"
 import { SendMail } from "../../utils/communication/mail"
 import { sendMailTypeCheck,sendMailPayloadType } from "../../types/gmail.type"
+import { BookingPayload } from "model/stockBooking.model"
 
 dotenv.config()
 
 const route = Router()
 
+route.post('/property/booking',async(req:Request,res:Response)=>{
+    const bodyData = req.body
+    const data:BookingPayload={
+        vendorRef:bodyData.vendorRef,
+        customerRef:bodyData.customerRef,
+        productRef:bodyData.productRef,
+        rating:"__",
+        review:"__",
+        bookingStatus:"created",
+        message:"__",
+        bookingDate:bodyData.bookingDate
+    }
+    const validateData = BookingModelCheck.parse(data)
+    BookingProperty(validateData).then((result)=>{
+        return res.status(200).json(result)
+    }).catch((error)=>{
+        return res.status(501).json(error)
+    })
+})
+
+route.get('/property/list',async(req:Request,res:Response)=>{
+    const param =  req.query
+    const start = parseInt(param.start as string) || 0
+    const end = parseInt(param.end as string) || 10
+
+    if(end <= start){
+        res.status(400).json({
+            message:"pagination start should not greater or equal to end!!"
+        })
+        return
+    }
+    GetProductList(start,end).then((result)=>{
+        return res.status(200).json(result)
+    }).catch((err)=>{
+        return res.status(500).json(err)
+    })
+})
 route.post('/property/post',async(req:Request,res:Response)=>{
     const body = req.body
     const validateData = productTypeCheck.parse(body);

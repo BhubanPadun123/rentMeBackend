@@ -28,5 +28,5 @@ connectDB().then(()=>{
 })
 
 app.use('/auth',authRoute)
-app.use('/upload',verifyToken,UploadImages)
+app.use('/upload',UploadImages)
 app.use("/v1",verifyToken,rootRoute)

@@ -1,11 +1,15 @@
 import Product from "../../model/product.model";
+import BookingModel,{
+    BookingPayload
+} from "../../model/stockBooking.model";
 import {
-    productTypeCheck 
+    productTypeCheck,
+    BookingModelCheck
 } from "../../types/product.type";
 
 type availableAminities={
     name:string;
-    count:number
+    count:string
 }
 type occupancy={
     occupancy:string
@@ -41,7 +45,7 @@ export type ProductPayload={
         geoLocation:any,
         propertyImages:images[]
     },
-    propertyOccupancy:occupancy[]
+    propertyOccupancy:string[]
 }
 export const PostProduct=(data:ProductPayload)=>{
     return new Promise(async(resolved,rejected)=>{
@@ -58,4 +62,39 @@ export const PostProduct=(data:ProductPayload)=>{
         }
     })
 }
+
+export const GetProductList=(start:number,end:number)=>{
+    return new Promise(async(resolved,rejected)=>{
+        try {
+            const limit = end - start
+            const products = await Product.find().skip(start).limit(limit).exec()
+            resolved(products)
+        } catch (error) {
+            rejected(error)
+        }
+    })
+}
+export const BookingProperty=(data:BookingPayload)=>{
+    return new Promise(async(resolved,rejected)=>{
+        try {
+            const validateData = BookingModelCheck.parse(data)
+            const newBooking =  new BookingModel(validateData)
+            const saveNewBooking = await newBooking.save()
+            resolved(saveNewBooking)
+        } catch (error) {
+            rejected(error)
+        }
+    })
+}
+export const GetVendorProduct=(id:string)=>{
+    return new Promise(async(resolved,rejected)=>{
+        try {
+            const productList = await Product.findById({_id:id})
+            resolved(productList)
+        } catch (error) {
+            rejected(error)
+        }
+    })
+}
+
 
