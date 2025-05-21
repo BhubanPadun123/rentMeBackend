@@ -1,4 +1,5 @@
 import Product from "../../model/product.model";
+import UserModel from "../../model/user.model";
 import BookingModel,{
     BookingPayload
 } from "../../model/stockBooking.model";
@@ -86,15 +87,35 @@ export const BookingProperty=(data:BookingPayload)=>{
         }
     })
 }
-export const GetVendorProduct=(id:string)=>{
+export const GetVendorProduct=(id:string[])=>{
     return new Promise(async(resolved,rejected)=>{
         try {
-            const productList = await Product.findById({_id:id})
-            resolved(productList)
+            const productList = await Product.find({vendorRef:id})
+            resolved(productList ? productList : [])
+        } catch (error) {
+            rejected(error)
+        }
+    })
+}
+export const GetOrderVendor=(productRef:string,vendorRef:string)=>{
+    return new Promise(async(resolved,rejected)=>{
+        try {
+            const list = await BookingModel.find({productRef:productRef,vendorRef:vendorRef})
+            resolved(list)
         } catch (error) {
             rejected(error)
         }
     })
 }
 
+export const GetVendorCustomers=(customerIds:string[])=>{
+    return new Promise(async(resolved,rejected)=>{
+        try {
+            const list = await UserModel.find({_id:customerIds})
+            resolved(list.length > 0 ? list : [])
+        } catch (error) {
+            rejected(error)
+        }
+    })
+}
 

@@ -6,10 +6,10 @@ import BookingConfirmationModel,{
 } from "../../model/bookingConfirmation.model";
 import { bookingConfirmationPayloadCheck } from "../../types/vendor.type";
 
-export const GetVendorBooking=(vendorId:string,productId:string):BookingPayload[] | any=>{
+export const GetVendorBooking=(vendorId:string):BookingPayload[] | any=>{
     return new Promise(async(resolved,rejected)=>{
         try {
-            const list = await BookingModel.find({vendorRef:vendorId,productRef:productId})
+            const list = await BookingModel.find({customerRef:vendorId})
             let productIds:BookingPayload[] = []
             if(Array.isArray(list) && list.length > 0){
                 list.map((item)=>{

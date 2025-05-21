@@ -5,8 +5,8 @@ import { CheckPrivillage } from "../middleware/apiAccessPermissionCheck"
 
 
 const route = Router()
-route.use('/product',CheckPrivillage,AddProduct)
-route.use("/manage",CheckPrivillage,ManageProduct)
+route.use('/product',AddProduct)
+route.use("/manage",ManageProduct)
 
 
 export default route
