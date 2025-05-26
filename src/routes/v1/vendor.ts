@@ -6,7 +6,9 @@ import {
 import {
     GetVendorProduct,
     GetOrderVendor,
-    GetVendorCustomers
+    GetVendorCustomers,
+    UpdateBookingStatus,
+    CheckProductAvailable
 } from "../../services/v1/productPost.service"
 import {
     GetVendorBooking,
@@ -65,6 +67,46 @@ router.get('/vendor/order_details',async(req:Request,res:Response)=>{
         return res.status(501).json(error)
     })
     
+})
+
+router.put('/vendor/update_booking',async(req:Request,res:Response)=>{
+    let {
+        vendorRef,
+        customerRef,
+        productRef,
+        status,
+        message
+    } = req.body
+
+    if(!vendorRef || !customerRef || !productRef){
+        res.status(401).json({
+            message:"mandatory data not provided!"
+        })
+        return
+    }
+    const isAvailableProduct = await CheckProductAvailable(vendorRef,productRef)
+    if(!isAvailableProduct){
+        status === "Rejected"
+        message = message ? message : "Property is now fully occupied !!1"
+    }
+    const isUpdated = await UpdateBookingStatus(
+        vendorRef,
+        customerRef,
+        productRef,
+        status,
+        message
+    )
+    if(isUpdated){
+        res.status(200).json({
+            message:"booking status updated successfully!"
+        })
+        return
+    }else{
+        res.status(500).json({
+            message:"Error while update the booking status,Please try after sometime"
+        })
+        return
+    }
 })
 
 
