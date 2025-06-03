@@ -123,8 +123,9 @@ export const CheckProductAvailable = async (vendorRef: string, productRef: strin
     try {
         const productData = await Product.find({ vendorRef, _id: productRef })
         if (productData && productData.length) {
-            console.log(productData)
-            return true
+            if (productData[0].availableStatus) {
+                return productData[0].availableStatus
+            }
         }
         return true
     } catch (error) {
@@ -132,13 +133,33 @@ export const CheckProductAvailable = async (vendorRef: string, productRef: strin
         return false;
     }
 }
+export const UpdateProductAvialableStatus = async (vendorRef: string, productRef: string) => {
+    return new Promise(async(resolved,rejected)=>{
+        try {
+            const productData = await Product.findOneAndUpdate({
+                vendorRef,
+                _id:productRef
+            },{
+                $set:{
+                    availableStatus:false
+                }
+            },{
+                new:false
+            })
+            productData ? resolved(productData) : rejected({message:"product not found"})
+        } catch (error) {
+            console.log(error)
+            rejected(error)
+        }
+    })
+}
 export const UpdateBookingStatus = async (
     vendorRef: string,
     customerRef: string,
     productRef: string,
     status: string,
     message: string
-): Promise<boolean> => {
+) => {
     try {
         const updateData = await BookingModel.findOneAndUpdate({
             vendorRef,
@@ -152,9 +173,23 @@ export const UpdateBookingStatus = async (
         }, {
             new: true
         })
-        return !!updateData
+        return updateData
     } catch (error) {
         console.log(error)
         return false
     }
+}
+export const GetBookingProducts = (ids: string[]) => {
+    return new Promise(async (resolved, rejected) => {
+        try {
+            const list = await BookingModel.find({ _id: ids })
+            if (list && list.length) {
+                resolved(list)
+            } else {
+                resolved([])
+            }
+        } catch (error) {
+            rejected(error)
+        }
+    })
 }

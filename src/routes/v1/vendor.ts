@@ -8,7 +8,10 @@ import {
     GetOrderVendor,
     GetVendorCustomers,
     UpdateBookingStatus,
-    CheckProductAvailable
+    CheckProductAvailable,
+    GetBookingProducts,
+    GetProductList,
+    UpdateProductAvialableStatus
 } from "../../services/v1/productPost.service"
 import {
     GetVendorBooking,
@@ -59,7 +62,10 @@ router.get('/vendor/order_details',async(req:Request,res:Response)=>{
         let customerIds:string[] = []
         result && Array.isArray(result) && result.map((item)=> customerIds.push(item.customerRef))
         GetVendorCustomers(customerIds).then((result_1)=>{
-            return res.status(200).json(result_1)
+            return res.status(200).json({
+                customer: result_1,
+                booking: result
+            })
         }).catch((err)=>{
             return res.status(501).json(err)
         })
@@ -69,13 +75,32 @@ router.get('/vendor/order_details',async(req:Request,res:Response)=>{
     
 })
 
+router.put('/vendor/orders',async(req:Request,res:Response)=>{
+    let {
+        ids
+    } = req.body
+    if(!ids){
+        res.status(501).json({
+            message:"Property booking ids misshing!!"
+        })
+        return
+    }
+    GetBookingProducts(ids).then((result)=>{
+        res.status(200).json(result)
+        return
+    }).catch((error)=>{
+        res.status(500).json(error)
+        return
+    })
+})
+
 router.put('/vendor/update_booking',async(req:Request,res:Response)=>{
     let {
         vendorRef,
         customerRef,
         productRef,
-        status,
-        message
+        status="",
+        message=""
     } = req.body
 
     if(!vendorRef || !customerRef || !productRef){
@@ -97,10 +122,21 @@ router.put('/vendor/update_booking',async(req:Request,res:Response)=>{
         message
     )
     if(isUpdated){
-        res.status(200).json({
-            message:"booking status updated successfully!"
+        UpdateProductAvialableStatus(
+            vendorRef,
+            productRef
+        ).then((result)=>{
+            GetOrderVendor(productRef,vendorRef).then((result_1)=>{
+                res.status(200).json({
+                    updatedResponse:isUpdated,
+                    allResponse:result_1
+                })
+            }).catch((err)=>{
+                return res.status(500).json(err)
+            })
+        }).catch((err)=>{
+            return res.status(500).json(err)
         })
-        return
     }else{
         res.status(500).json({
             message:"Error while update the booking status,Please try after sometime"
