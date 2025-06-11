@@ -6,7 +6,7 @@
   "author": "Bhuban Padun",
   "license": "MIT",
   "scripts": {
-    "start": "node build/index.js",
+    "start": "node index.js",
     "build": "tsc -p .",
     "dev": "nodemon index.ts"
   },
