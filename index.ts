@@ -1,12 +1,12 @@
 import express, { Application, Request, Response } from 'express';
 import cors from "cors"
-import connectDB from "./config/db"
+import connectDB from "./src/config/db"
 import dotenv from "dotenv"
-import rootRoute from "./routes/index"
-import authRoute from "./routes/auth/auth.controller"
-import { verifyToken } from "./middleware/auth.middleware"
-import UploadImages from "./routes/upload/imageUpload"
-import Rconnect from "../src/config/radisConnect"
+import rootRoute from "./src/routes/index"
+import authRoute from "./src/routes/auth/auth.controller"
+import {verifyToken} from "./src/middleware/auth.middleware"
+import UploadImages from "./src/routes/upload/imageUpload"
+import Rconnect from "./src/config/radisConnect"
 
 dotenv.config()
 
