@@ -9,7 +9,9 @@ import {verifyToken} from "./src/middleware/auth.middleware"
 import connectDB from "./src/config/db"
 import Rconnect from "./src/config/radisConnect"
 import CustomerManage from "./src/routes/v1/customer"
+import dotenv from "dotenv"
 
+dotenv.config()
 
 const route = Router()
 const app = express();
