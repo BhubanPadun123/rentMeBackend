@@ -25,6 +25,16 @@ interface User {
 }
 import { USER_ROLES,USER_PRIVILLAGES } from "../utils/privilages";
 
+export const updateMetaData=(metaData:any,id:string)=>{
+    return new Promise(async(resolved,rejected)=>{
+        try {
+            const update = await UserModel.findOneAndUpdate({_id:id},{metaData:JSON.stringify(metaData)},{new:true})
+            resolved(update)
+        } catch (error) {
+            rejected(error)
+        }
+    })
+}
 export const createUser = (user: User) => {
     return new Promise(async (resolved, rejected) => {
         try {
@@ -36,7 +46,8 @@ export const createUser = (user: User) => {
                 userType: validateUser.userType,
                 password: validateUser.password,
                 isVerifyed: validateUser.isVerifyed,
-                privillages:validateUser.privillages
+                privillages:validateUser.privillages,
+                metaData:"{}"
             })
             const saveUser = await newUser.save()
             resolved({message:"user register successfully!!"})
@@ -121,14 +132,10 @@ export const forgetPassword=(data:passwordForgetData)=>{
         }
     })
 }
-export const checkUser=(userEmail:string)=>{
+export const checkUser=(_id:string)=>{
     return new Promise(async(resolved,rejected)=>{
         try {
-            const data = {
-                userEmail:userEmail
-            }
-            const validateData = checkUserExistType.parse(data);
-            const isUserExist = await UserModel.findOne({userEmail:validateData.userEmail});
+            const isUserExist = await UserModel.findById(_id)
             if(isUserExist){
                 resolved({
                     message:"User getting successfully",
@@ -136,7 +143,7 @@ export const checkUser=(userEmail:string)=>{
                 })
             }else{
                 rejected({
-                    message:`user does not exist with email:${validateData.userEmail}`,
+                    message:`user does not exist with email:${_id}`,
                     data:[]
                 })
             }

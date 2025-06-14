@@ -37,3 +37,59 @@ export const CreateOrderStatus=(data:BookingConfirmationPayload)=>{
         }
     })
 }
+
+export const GetBookingStatus=(productId:string,uid:string)=>{
+    return new Promise(async(resolved,rejected)=>{
+        try {
+            const item = await BookingModel.findOne({productRef:productId,customerRef:uid})
+            resolved(item ? item : [])
+        } catch (error) {
+            rejected(error)
+        }
+    })
+}
+
+export const UpdateBookingStatus=(id:string,status:string)=>{
+    return new Promise(async(resolved,rejected)=>{
+        try {
+            const updateData = await BookingModel.findOneAndUpdate({
+                _id:id
+            },{
+                $set:{
+                    bookingStatus:status
+                }
+            },{
+                new:false
+            })
+            resolved(updateData)
+        } catch (error) {
+            rejected(error)
+        }
+    })
+}
+export const CheckIsBookingAllow=(orderRef:string)=>{
+    return new Promise(async(resolved,rejected)=>{
+        try {
+            const order = await BookingModel.findById(orderRef)
+            if(order){
+                const code =order.bookingStatus
+                if(code !== "1"){
+                    rejected({
+                        message:"Can't allow for booking,This property is alrady occupy with other person",
+                        occupancyCustomerId:order.customerRef
+                    })
+                }else{
+                    resolved({
+                        message:"Allow for booking"
+                    })
+                }
+            }else{
+                rejected({
+                    message:`Order does not exist with id=${orderRef}`
+                })
+            }
+        } catch (error) {
+            rejected(error)
+        }
+    })
+}
