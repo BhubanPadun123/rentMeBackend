@@ -16,6 +16,8 @@ import {
 import {
     GetVendorBooking,
     CreateOrderStatus,
+    GetBookingStatus,
+    CheckIsBookingAllow,
 } from "../../services/v1/order.manage"
 import {
     bookingConfirmationPayloadCheck
@@ -26,25 +28,29 @@ import {
 import {
     BookingConfirmationPayload
 } from "../../model/bookingConfirmation.model"
+import {
+    updateMetaData
+} from "../../services/v1/productPost.service"
 
 
 const router = Router()
-router.get('/vender/product',async(req:Request,res:Response)=>{
+router.get('/metaData',async(req:Request,res:Response)=>{
     const params = req.query
     const id:string = params.userId as string
-    GetVendorProduct([id]).then((result)=>{
-        return res.status(200).json(result)
+    GetVendorProduct([id]).then((result:any)=>{
+        const metaData = Array.isArray(result) && result[0].metaData && JSON.parse(result[0].metaData)
+        return res.status(200).json(metaData)
     }).catch((err)=>{
         return res.status(401).json(err)
     })
 })
-router.get('/vendor/booking',async(req:Request,res:Response)=>{
+router.get('/booking',async(req:Request,res:Response)=>{
     const params = req.query
     const vendorId:string = params.vendorRef as string
 
     GetVendorBooking(vendorId).then((result:BookingPayload[])=>{
         let productIds:string[] = []
-        result.length > 0 && result.map((item)=> productIds.push(item.vendorRef))
+        result.length > 0 && result.map((item)=> productIds.push(item.productRef))
         GetVendorProduct(productIds).then((result_1)=>{
             return res.status(200).json(result_1)
         }).catch((err)=>{
@@ -54,21 +60,21 @@ router.get('/vendor/booking',async(req:Request,res:Response)=>{
         return res.status(500).json(error)
     })
 })
-router.get('/vendor/order_details',async(req:Request,res:Response)=>{
+router.get('/status',async(req:Request,res:Response)=>{
     const params = req.query
-    const productRef = params.productRef as string
+    const orderId:string = params.orderId as string
+    const uid:string = params.uid as string
+    GetBookingStatus(orderId,uid).then((result)=>{
+        return res.status(200).json(result)
+    }).catch((err)=>{
+        return res.status(500).json(err)
+    })
+})
+router.get('/order_details',async(req:Request,res:Response)=>{
+    const params = req.query
     const vendorRef = params.vendorRef as string
-    GetOrderVendor(productRef,vendorRef).then((result)=>{
-        let customerIds:string[] = []
-        result && Array.isArray(result) && result.map((item)=> customerIds.push(item.customerRef))
-        GetVendorCustomers(customerIds).then((result_1)=>{
-            return res.status(200).json({
-                customer: result_1,
-                booking: result
-            })
-        }).catch((err)=>{
-            return res.status(501).json(err)
-        })
+    GetOrderVendor(vendorRef).then((result)=>{
+        return res.status(200).json(result)
     }).catch((error)=>{
         return res.status(501).json(error)
     })
@@ -94,55 +100,40 @@ router.put('/vendor/orders',async(req:Request,res:Response)=>{
     })
 })
 
-router.put('/vendor/update_booking',async(req:Request,res:Response)=>{
+router.put('/update_booking',async(req:Request,res:Response)=>{
     let {
-        vendorRef,
-        customerRef,
-        productRef,
-        status="",
-        message=""
+        bookingRef,
+        status,
+        pid,
+        metaData
     } = req.body
 
-    if(!vendorRef || !customerRef || !productRef){
+    if(!bookingRef || !pid || !metaData){
         res.status(401).json({
             message:"mandatory data not provided!"
         })
         return
     }
-    const isAvailableProduct = await CheckProductAvailable(vendorRef,productRef)
-    if(!isAvailableProduct){
-        status === "Rejected"
-        message = message ? message : "Property is now fully occupied !!1"
-    }
-    const isUpdated = await UpdateBookingStatus(
-        vendorRef,
-        customerRef,
-        productRef,
-        status,
-        message
-    )
-    if(isUpdated){
-        UpdateProductAvialableStatus(
-            vendorRef,
-            productRef
-        ).then((result)=>{
-            GetOrderVendor(productRef,vendorRef).then((result_1)=>{
-                res.status(200).json({
-                    updatedResponse:isUpdated,
-                    allResponse:result_1
-                })
-            }).catch((err)=>{
-                return res.status(500).json(err)
+    updateMetaData(pid,metaData).then(async(result)=>{
+        console.log(result,"<<<")
+        const isUpdated = await UpdateBookingStatus(bookingRef,status)
+        if(isUpdated){
+            res.status(200).json({
+                message:"status updated successfully!"
             })
-        }).catch((err)=>{
-            return res.status(500).json(err)
-        })
-    }else{
-        res.status(500).json({
-            message:"Error while update the booking status,Please try after sometime"
-        })
-        return
-    }
+        }else{
+            res.status(500).json({
+                message:"Error while update the booking status,Please try after sometime"
+            })
+            return
+        }
+    }).catch((err)=>{
+        return res.status(500).json(err)
+    })
+})
+
+router.get('/product',async(req:Request,res:Response)=>{
+    
 })
 
 

@@ -13,31 +13,7 @@ export interface ProductPayload extends Document {
     postAt: string;
     availableStatus: boolean;
     propertyOccupancy: string[];
-    metaData: {
-        description: string;
-        availableAminities: {
-            name: string;
-            count: number;
-        }[];
-        rentInfo: {
-            depositeAmount: string;
-            rent_per_month: string;
-        };
-        vendorContactInfo: {
-            name: string;
-            email: string;
-            contactNumber: string;
-        };
-        addressInfo: {
-            pinCode: string;
-            district: string;
-            state: string;
-            town: string;
-            localAdd: string;
-        };
-        geoLocation?: any;
-        propertyImages: images[];
-    };
+    metaData: any;
 }
 
 // Define the schema
@@ -48,39 +24,7 @@ const ProductSchema = new Schema<ProductPayload>({
     postAt: { type: String, required: true },
     availableStatus: { type: Boolean, required: true },
     propertyOccupancy: { type: [String], required: true },
-    metaData: {
-        type: new Schema({
-            description: { type: String, required: true },
-            availableAminities: [{
-                name: { type: String, required: true },
-                count: { type: Number, required: true }
-            }],
-            rentInfo: {
-                depositeAmount: { type: String, required: true },
-                rent_per_month: { type: String, required: true }
-            },
-            vendorContactInfo: {
-                name: { type: String, required: true },
-                email: { type: String, required: true },
-                contactNumber: { type: String, required: true }
-            },
-            addressInfo: {
-                pinCode: { type: String, required: true },
-                district: { type: String, required: true },
-                state: { type: String, required: true },
-                town: { type: String, required: true },
-                localAdd: { type: String, required: true }
-            },
-            geoLocation: {
-                type: Schema.Types.Mixed,
-                required: false
-            },
-            propertyImages: [{
-                url: { type: String, required: true }
-            }]
-        }),
-        required: true
-    }
+    metaData: {type:Object}
 });
 
 // Create and export the model

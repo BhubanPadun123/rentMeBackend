@@ -21,6 +21,8 @@ import {
 } from "../../config/radisConnect"
 import { USER_ROLES, USER_PRIVILLAGES } from "../../utils/privilages"
 import { UserPayload } from "../../model/user.model"
+import { verifyToken } from "../../middleware/auth.middleware"
+import updateProfile from "./updateProfile"
 
 dotenv.config()
 
@@ -72,6 +74,7 @@ route.post('/login', (req: Request, res: Response) => {
 })
 
 route.post("/register", async (req: Request, res: Response) => {
+    console.log(req.body)
     const {
         userName,
         userEmail,
@@ -110,5 +113,6 @@ route.get('/privilages', (req: Request, res: Response) => {
     })
     return
 })
+route.use('/profile',verifyToken,updateProfile)
 
 export default route

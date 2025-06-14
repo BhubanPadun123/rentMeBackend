@@ -20,12 +20,14 @@ import { ProductPayload } from "../../services/v1/productPost.service"
 import { SendMail } from "../../utils/communication/mail"
 import { sendMailTypeCheck,sendMailPayloadType } from "../../types/gmail.type"
 import { BookingPayload } from "model/stockBooking.model"
+import { UserPayload } from "model/user.model"
 
 dotenv.config()
 
 const route = Router()
 
-route.post('/property/booking',async(req:Request,res:Response)=>{
+
+route.post('/booking',async(req:Request,res:Response)=>{
     const bodyData = req.body
     const data:BookingPayload={
         vendorRef:bodyData.vendorRef,
@@ -33,7 +35,7 @@ route.post('/property/booking',async(req:Request,res:Response)=>{
         productRef:bodyData.productRef,
         rating:"__",
         review:"__",
-        bookingStatus:"created",
+        bookingStatus:"1",
         message:"__",
         bookingDate:bodyData.bookingDate
     }
@@ -45,7 +47,7 @@ route.post('/property/booking',async(req:Request,res:Response)=>{
     })
 })
 
-route.get('/property/list',async(req:Request,res:Response)=>{
+route.get('/list',async(req:Request,res:Response)=>{
     const param =  req.query
     const start = parseInt(param.start as string) || 0
     const end = parseInt(param.end as string) || 10
@@ -62,47 +64,42 @@ route.get('/property/list',async(req:Request,res:Response)=>{
         return res.status(500).json(err)
     })
 })
-route.post('/property/post',async(req:Request,res:Response)=>{
+route.post('/add',async(req:Request,res:Response)=>{
     const body = req.body
     const validateData = productTypeCheck.parse(body);
-    checkUser(validateData.metaData.vendorContactInfo.email).then((result_1)=>{
+    console.log(validateData)
+    checkUser(validateData.vendorRef).then((result_1)=>{
         const data:ProductPayload={
             vendorRef:validateData.vendorRef,
             productTitle:validateData.productTitle,
             productType:validateData.productType,
             postAt:validateData.postAt,
             availableStatus:validateData.availableStatus,
-            metaData:{
-                description:validateData.metaData.description,
-                availableAminities:validateData.metaData.availableAminities,
-                rentInfo:validateData.metaData.rentInfo,
-                vendorContactInfo:validateData.metaData.vendorContactInfo,
-                addressInfo:validateData.metaData.addressInfo,
-                geoLocation:validateData.metaData.geoLocation,
-                propertyImages:validateData.metaData.propertyImages
-            },
+            metaData:validateData.metaData,
             propertyOccupancy:validateData.propertyOccupancy
 
         }
         PostProduct(data).then((result_2)=>{
-            const mailData:sendMailPayloadType={
-                to:validateData.metaData.vendorContactInfo.email,
-                message:"Thank you for using our platform.Your property is being uploaded successfully!!.Our people will visit soon and verify your Property for customer trust.",
-                subject:"Property uploaded successfully!!"
-            }
-            const validateEmailData = sendMailTypeCheck.parse(mailData)
-            SendMail(validateEmailData).then((result_3)=>{
-                return res.status(200).json({
-                    message:"Message sent to owner",
-                    data:result_2
-                })
-            }).catch((err)=>{
-                return res.status(200).json({
-                    message:"Error occured while sent message to the owner!",
-                    data:result_2
-                })
-            })
+            return res.status(200).json(result_2)
+            // const mailData:sendMailPayloadType={
+            //     to:result_1?.userEmail,
+            //     message:"Thank you for using our platform.Your property is being uploaded successfully!!.Our people will visit soon and verify your Property for customer trust.",
+            //     subject:"Property uploaded successfully!!"
+            // }
+            // const validateEmailData = sendMailTypeCheck.parse(mailData)
+            // SendMail(validateEmailData).then((result_3)=>{
+            //     return res.status(200).json({
+            //         message:"Message sent to owner",
+            //         data:result_2
+            //     })
+            // }).catch((err)=>{
+            //     return res.status(200).json({
+            //         message:"Error occured while sent message to the owner!",
+            //         data:result_2
+            //     })
+            // })
         }).catch((err)=>{
+            console.log(err)
             return res.status(502).json(err)
         })
     }).catch((err)=>{

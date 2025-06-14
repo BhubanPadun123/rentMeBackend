@@ -24,28 +24,7 @@ export type ProductPayload = {
     productType: string;
     postAt: string;
     availableStatus: boolean;
-    metaData: {
-        description: string;
-        availableAminities: availableAminities[],
-        rentInfo: {
-            depositeAmount: string;
-            rent_per_month: string
-        },
-        vendorContactInfo: {
-            name: string;
-            email: string;
-            contactNumber: string;
-        },
-        addressInfo: {
-            pinCode: string;
-            district: string;
-            state: string;
-            town: string;
-            localAdd: string;
-        },
-        geoLocation: any,
-        propertyImages: images[]
-    },
+    metaData: any,
     propertyOccupancy: string[]
 }
 export const PostProduct = (data: ProductPayload) => {
@@ -90,17 +69,27 @@ export const BookingProperty = (data: BookingPayload) => {
 export const GetVendorProduct = (id: string[]) => {
     return new Promise(async (resolved, rejected) => {
         try {
-            const productList = await Product.find({ vendorRef: id })
+            const productList = await Product.find({ _id: id })
             resolved(productList ? productList : [])
         } catch (error) {
             rejected(error)
         }
     })
 }
-export const GetOrderVendor = (productRef: string, vendorRef: string) => {
+export const GetOrderVendor = (vendorRef: string) => {
     return new Promise(async (resolved, rejected) => {
         try {
-            const list = await BookingModel.find({ productRef: productRef, vendorRef: vendorRef })
+            const list = await BookingModel.find({vendorRef: vendorRef })
+            resolved(list)
+        } catch (error) {
+            rejected(error)
+        }
+    })
+}
+export const GetCustomerOrder =(customerRef:string)=>{
+    return new Promise(async (resolved, rejected) => {
+        try {
+            const list = await BookingModel.find({customerRef: customerRef })
             resolved(list)
         } catch (error) {
             rejected(error)
@@ -154,21 +143,15 @@ export const UpdateProductAvialableStatus = async (vendorRef: string, productRef
     })
 }
 export const UpdateBookingStatus = async (
-    vendorRef: string,
-    customerRef: string,
-    productRef: string,
-    status: string,
-    message: string
+    bookingRef:string,
+    status:string
 ) => {
     try {
         const updateData = await BookingModel.findOneAndUpdate({
-            vendorRef,
-            customerRef,
-            productRef
+            _id:bookingRef
         }, {
             $set: {
                 bookingStatus: status,
-                message: message
             }
         }, {
             new: true
@@ -188,6 +171,25 @@ export const GetBookingProducts = (ids: string[]) => {
             } else {
                 resolved([])
             }
+        } catch (error) {
+            rejected(error)
+        }
+    })
+}
+
+export const updateMetaData=(pid:string,metaData:string)=>{
+    return new Promise(async(resolved,rejected)=>{
+        try {
+            const update = await Product.findOneAndUpdate({
+                _id:pid
+            },{
+                $set:{
+                    metaData:metaData
+                }
+            },{
+                new:false
+            })
+            resolved(update)
         } catch (error) {
             rejected(error)
         }

@@ -18,7 +18,8 @@ export interface User extends Document{
     userType:string;
     password:string;
     isVerifyed:boolean;
-    privillages:string[]
+    privillages:string[];
+    metaData?:any
 }
 
 const mongooseUserSchema = new Schema<User>({
@@ -54,7 +55,8 @@ const mongooseUserSchema = new Schema<User>({
         min:6,
         max:10
     },
-    privillages:{type:[String],required:true}
+    privillages:{type:[String],required:true},
+    metaData:{type:Object,default:{}}
 })
 
 mongooseUserSchema.pre<User>('save',async function(next){
