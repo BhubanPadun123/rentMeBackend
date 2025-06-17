@@ -39,6 +39,7 @@ import {
     CreateNotification,
     GetNotifications
 } from "../../services/v1/notification.service"
+import { NotificationPayload } from "../../model/notification"
 
 
 const router = Router()
@@ -122,9 +123,18 @@ router.put('/update_booking',async(req:Request,res:Response)=>{
         })
         return
     }
-    updateMetaData(pid,metaData).then(async(result)=>{
+    updateMetaData(pid,metaData).then(async(result:any)=>{
         const isUpdated = await UpdateBookingStatus(bookingRef,status)
         if(isUpdated){
+            const customerRef = result.customerRef ? result.customerRef : ""
+            const notification:NotificationPayload={
+                userRef:customerRef,
+                token:"",
+                message:"Your booking property status were updated by owner",
+                title:"Booking property status update alert",
+                redirectLink:"ServiceBookingScreen"
+            }
+            CreateNotification(notification)
             res.status(200).json({
                 message:"status updated successfully!"
             })

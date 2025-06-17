@@ -2,6 +2,7 @@ import {Router,Request,Response} from "express"
 import { GetCustomerOrder } from "../../services/v1/productPost.service"
 import {
     CreatePayment,
+    GetAllPayment,
     GetPaymentStatus,
     UpdatePayment
 } from "../../services/v1/payment.service"
@@ -84,6 +85,14 @@ route.get('/payment_detail/:orderid',(req:Request,res:Response)=>{
         })
     }
     GetPaymentStatus(orderId).then((result)=>{
+        return res.status(200).json(result)
+    }).catch((err)=>{
+        return res.status(500).json(err)
+    })
+})
+
+route.get('/payment',(req:Request,res:Response)=>{
+    GetAllPayment().then((result)=>{
         return res.status(200).json(result)
     }).catch((err)=>{
         return res.status(500).json(err)

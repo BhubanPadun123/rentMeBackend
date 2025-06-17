@@ -38,7 +38,17 @@ export const UpdatePayment=(orderRef:string,data:PaymentPayload)=>{
             )
             resolved(update)
         } catch (error) {
-            resolved(error)
+            rejected(error)
+        }
+    })
+}
+export const GetAllPayment=()=>{
+    return new Promise(async(resolved,rejected)=>{
+        try {
+            const data = await PaymentModel.find({})
+            resolved(data)
+        } catch (error) {
+            rejected(error)
         }
     })
 }

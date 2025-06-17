@@ -21,6 +21,8 @@ import { SendMail } from "../../utils/communication/mail"
 import { sendMailTypeCheck,sendMailPayloadType } from "../../types/gmail.type"
 import { BookingPayload } from "model/stockBooking.model"
 import { UserPayload } from "model/user.model"
+import { CreateNotification } from "../../services/v1/notification.service"
+import { NotificationPayload } from "../../model/notification"
 
 dotenv.config()
 
@@ -41,6 +43,14 @@ route.post('/booking',async(req:Request,res:Response)=>{
     }
     const validateData = BookingModelCheck.parse(data)
     BookingProperty(validateData).then((result)=>{
+        const notificationData:NotificationPayload={
+            userRef:data.vendorRef,
+            token:"",
+            message:"Your property is booking some one.Please update the booking status",
+            title:"New booking alert",
+            redirectLink:"FeedBackScreen"
+        }
+        CreateNotification(notificationData)
         return res.status(200).json(result)
     }).catch((error)=>{
         return res.status(501).json(error)
