@@ -21,7 +21,7 @@ const BookingSchema = new Schema<BookingPayload>({
     rating:{type:String,required:true},
     review:{type:String,required:true},
     bookingDate:{type:String,required:true}
-})
+},{timestamps:true})
 
 const BookingModel = mongoose.model<BookingPayload>("BookingModel",BookingSchema)
 

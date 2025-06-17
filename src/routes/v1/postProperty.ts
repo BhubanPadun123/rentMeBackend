@@ -50,7 +50,7 @@ route.post('/booking',async(req:Request,res:Response)=>{
 route.get('/list',async(req:Request,res:Response)=>{
     const param =  req.query
     const start = parseInt(param.start as string) || 0
-    const end = parseInt(param.end as string) || 10
+    const end = parseInt(param.end as string) || 5
 
     if(end <= start){
         res.status(400).json({

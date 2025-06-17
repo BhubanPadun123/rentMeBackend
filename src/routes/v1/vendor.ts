@@ -11,13 +11,17 @@ import {
     CheckProductAvailable,
     GetBookingProducts,
     GetProductList,
-    UpdateProductAvialableStatus
+    UpdateProductAvialableStatus,
+    GetVendorStock,
+    UpdateProduct,
+    DeleteProduct
 } from "../../services/v1/productPost.service"
 import {
     GetVendorBooking,
     CreateOrderStatus,
     GetBookingStatus,
     CheckIsBookingAllow,
+    GetOrdersInRange,
 } from "../../services/v1/order.manage"
 import {
     bookingConfirmationPayloadCheck
@@ -31,6 +35,10 @@ import {
 import {
     updateMetaData
 } from "../../services/v1/productPost.service"
+import {
+    CreateNotification,
+    GetNotifications
+} from "../../services/v1/notification.service"
 
 
 const router = Router()
@@ -115,7 +123,6 @@ router.put('/update_booking',async(req:Request,res:Response)=>{
         return
     }
     updateMetaData(pid,metaData).then(async(result)=>{
-        console.log(result,"<<<")
         const isUpdated = await UpdateBookingStatus(bookingRef,status)
         if(isUpdated){
             res.status(200).json({
@@ -132,9 +139,106 @@ router.put('/update_booking',async(req:Request,res:Response)=>{
     })
 })
 
-router.get('/product',async(req:Request,res:Response)=>{
-    
+router.get('/stock',async(req:Request,res:Response)=>{
+    const params = req.query
+    const id:string = params.userId as string
+    GetVendorStock(id).then((result)=>{
+        return res.status(200).json(result)
+    }).catch((err)=>{
+        return res.status(500).json(err)
+    })
 })
 
+router.put('/product',async(req:Request,res:Response)=>{
+    const body = req.body
+    const {
+        productId,
+        data
+    } = body
+    if(!productId || !data){
+        res.status(401).json({
+            message:"mandatory data missing!"
+        })
+        return
+    }
+    UpdateProduct(productId,data).then((result)=>{
+        return res.status(200).json(result)
+    }).catch((err)=>{
+        return res.status(500).json(err)
+    })
+})
+router.delete('/product',async(req:Request,res:Response)=>{
+    const params = req.query
+    const productId = params.productId as string
+    if(!productId){
+        res.status(401).json({
+            message:"product id missing!"
+        })
+    }
+    DeleteProduct(productId).then((result)=>{
+        return res.status(200).json(result)
+    }).catch((err)=>{
+        return res.status(500).json(err)
+    })
+})
+router.get('/all_order',(req:Request,res:Response)=>{
+    const params = req.query
+    const start = Number(params.start) as  number || 0
+    const end = Number(params.end) as number || 5
+
+    GetOrdersInRange(start,end).then((result)=>{
+        return res.status(200).json(result)
+    }).catch((err)=>{
+        return res.status(500).json(err)
+    })
+})
+router.post('/notification',(req,res)=>{
+    const body = req.body
+    const {
+        userRef,
+        token,
+        message,
+        title,
+        redirectLink
+    } = body
+
+    if(!userRef || !token || !message || !title){
+        return
+    }
+    const data = {
+        userRef,
+        token,
+        message,
+        title,
+        redirectLink
+    }
+    CreateNotification(data).then((result)=>{
+        return res.status(200).json({
+            message:"notification created succssfull!",
+            data:result
+        })
+    }).catch((err)=>{
+        return res.status(500).json({
+            message:"Error while send the notification",
+            error:err
+        })
+    })
+})
+
+router.get('/notification',(req:Request,res:Response)=>{
+    const params = req.query
+    const userRef = params.userRef as string
+    if(!userRef){
+        res.status(401).json({
+            message:"user id missing!"
+        })
+        return
+    }
+    GetNotifications(userRef).then((result)=>{
+        return res.status(200).json(result)
+    }).catch((err)=>{
+        return res.status(500).json(err)
+    })
+})
 
 export default router

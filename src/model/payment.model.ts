@@ -44,7 +44,7 @@ const mongoosePaymentSchema = new Schema<Payment>({
         type:Number,
         required:true
     }
-})
+},{timestamps:true})
 
 const PaymentModel = mongoose.model<Payment>("PaymentModel",mongoosePaymentSchema)
 export default PaymentModel

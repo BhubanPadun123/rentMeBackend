@@ -195,3 +195,39 @@ export const updateMetaData=(pid:string,metaData:string)=>{
         }
     })
 }
+
+export const GetVendorStock=(vendorRef:string)=>{
+    return new Promise(async(resolved,rejected)=>{
+        try {
+            const list = await Product.find({vendorRef:vendorRef})
+            resolved(list)
+        } catch (error) {
+            rejected(error)
+        }
+    })
+}
+
+export const UpdateProduct=(productRef:string,data:ProductPayload)=>{
+    return new Promise(async(resolved,rejected)=>{
+        try {
+            const updateData = await Product.findOneAndUpdate(
+                {_id:productRef},
+                data,
+                {new:false}
+            )
+            resolved(updateData)
+        } catch (error) {
+            rejected(error)
+        }
+    })
+}
+export const DeleteProduct=(productRef:string)=>{
+    return new Promise(async(resolved,rejected)=>{
+        try {
+            const deleteProduct = await Product.findByIdAndDelete(productRef)
+            resolved(deleteProduct)
+        } catch (error) {
+            rejected(error)
+        }
+    })
+}

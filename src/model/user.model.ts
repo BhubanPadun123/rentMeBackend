@@ -57,7 +57,7 @@ const mongooseUserSchema = new Schema<User>({
     },
     privillages:{type:[String],required:true},
     metaData:{type:Object,default:{}}
-})
+},{timestamps:true})
 
 mongooseUserSchema.pre<User>('save',async function(next){
     if(!this.isModified('password')) return next();
