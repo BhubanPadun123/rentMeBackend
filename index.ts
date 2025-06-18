@@ -7,7 +7,7 @@ import cors from "cors"
 import auth from "./src/routes/auth/auth.controller"
 import {verifyToken} from "./src/middleware/auth.middleware"
 import connectDB from "./src/config/db"
-import Rconnect from "./src/config/radisConnect"
+// import Rconnect from "./src/config/radisConnect"
 import CustomerManage from "./src/routes/v1/customer"
 import dotenv from "dotenv"
 
@@ -28,7 +28,7 @@ app.get('/', (req, res) => {
 });
 (async function(){
     await connectDB()
-    await Rconnect()
+    // await Rconnect()
 })()
 app.listen(PORT, () => {
     console.log(`Server is listening on port ${PORT}`);
