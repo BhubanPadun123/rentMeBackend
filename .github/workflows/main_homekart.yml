@@ -21,9 +21,9 @@ jobs:
         with:
           node-version: '20'
 
-      # Install dependencies
+      # Install dependencies with legacy peer deps
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --force
 
       # Build TypeScript code
       - name: Compile TypeScript
