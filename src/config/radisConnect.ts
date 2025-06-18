@@ -1,16 +1,16 @@
-// import {createClient} from "redis"
+import {createClient} from "redis"
 
 
-// const RadisCline = createClient()
+const RadisCline = createClient()
 
-// RadisCline.on('error',(err)=> console.log('Redis Client Error', err))
+RadisCline.on('error',(err)=> console.log('Redis Client Error', err))
 
-// const Rconnect = async()=>{
-//     await RadisCline.connect()
-// }
+const Rconnect = async()=>{
+    await RadisCline.connect()
+}
 
-// export {
-//     RadisCline
-// }
+export {
+    RadisCline
+}
 
-// export default Rconnect
+export default Rconnect
