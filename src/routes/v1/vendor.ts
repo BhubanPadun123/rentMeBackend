@@ -37,6 +37,7 @@ import {
 } from "../../services/v1/productPost.service"
 import {
     CreateNotification,
+    DeleteNotification,
     GetNotifications
 } from "../../services/v1/notification.service"
 import { NotificationPayload } from "../../model/notification"
@@ -248,6 +249,21 @@ router.get('/notification',(req:Request,res:Response)=>{
         return res.status(200).json(result)
     }).catch((err)=>{
         return res.status(500).json(err)
+    })
+})
+router.delete('/notification',(req,res)=>{
+    const param = req.query
+    const id = param.id as string
+    if(!id){
+        res.status(500).json({
+            message:"Id missing!"
+        })
+        return
+    }
+    DeleteNotification(id).then((result)=>{
+        return res.status(200).json(result)
+    }).catch((err)=>{
+        return res.status(err)
     })
 })
 

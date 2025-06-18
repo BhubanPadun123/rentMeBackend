@@ -22,3 +22,14 @@ export const GetNotifications=(userRef:string)=>{
         }
     })
 }
+
+export const DeleteNotification=(id:string)=>{
+    return new Promise(async(resolved,rejected)=>{
+        try {
+            const deleteData = await NotificationModel.findByIdAndDelete(id)
+            resolved(deleteData)
+        } catch (error) {
+            rejected(error)
+        }
+    })
+}

@@ -231,3 +231,14 @@ export const DeleteProduct=(productRef:string)=>{
         }
     })
 }
+
+export const FindAllProperty=()=>{
+    return new Promise(async(resolved,rejected)=>{
+        try {
+            const data = await Product.find({})
+            resolved(data)
+        } catch (error) {
+            rejected(error)
+        }
+    })
+}

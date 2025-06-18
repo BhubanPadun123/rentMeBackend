@@ -14,7 +14,8 @@ import {
 import {
     PostProduct,
     GetProductList,
-    BookingProperty
+    BookingProperty,
+    FindAllProperty
 } from "../../services/v1/productPost.service"
 import { ProductPayload } from "../../services/v1/productPost.service"
 import { SendMail } from "../../utils/communication/mail"
@@ -23,6 +24,7 @@ import { BookingPayload } from "model/stockBooking.model"
 import { UserPayload } from "model/user.model"
 import { CreateNotification } from "../../services/v1/notification.service"
 import { NotificationPayload } from "../../model/notification"
+import { getRandomColor } from "../../utils/randomColor"
 
 dotenv.config()
 
@@ -45,7 +47,7 @@ route.post('/booking',async(req:Request,res:Response)=>{
     BookingProperty(validateData).then((result)=>{
         const notificationData:NotificationPayload={
             userRef:data.vendorRef,
-            token:"",
+            token:"__",
             message:"Your property is booking some one.Please update the booking status",
             title:"New booking alert",
             redirectLink:"FeedBackScreen"
@@ -116,5 +118,59 @@ route.post('/add',async(req:Request,res:Response)=>{
         return res.status(500).json(err)
     })
 })
+
+
+route.get('/area', (req: Request, res: Response) => {
+    const params = req.query;
+    const town = params.town as string;
+    const type = params.type as string;
+
+    if (!town) {
+        res.status(500).json({
+            message: "town missing",
+        });
+        return;
+    }
+
+    FindAllProperty().then((result: any) => {
+        let dataCollection: any = [];
+
+        if (result && Array.isArray(result) && result.length > 0) {
+            for (const item of result) {
+                const metaData = item.metaData;
+                const metaDataInfo = metaData ? JSON.parse(metaData) : null;
+                const address = metaDataInfo && metaDataInfo.hasOwnProperty('addressInfo')
+                    ? metaDataInfo.addressInfo
+                    : null;
+                const geoLocation = metaDataInfo && metaDataInfo.hasOwnProperty('geoLocation')
+                    ? JSON.parse(metaDataInfo.geoLocation)
+                    : null;
+
+                if (type && type.trim() === "map") {
+                    if (metaDataInfo && metaDataInfo.hasOwnProperty('town')) {
+                        const townName = JSON.parse(JSON.stringify(metaDataInfo)).town
+                        if (metaDataInfo.town.trim().toLowerCase() == town.trim().toLowerCase()) {
+                            dataCollection.push({
+                                id: item._id,
+                                title: item.productTitle,
+                                latitude: geoLocation ? geoLocation.coords.latitude : "",
+                                longitude: geoLocation ? geoLocation.coords.longitude : "",
+                                color: getRandomColor(),
+                            });
+                        }
+                    }
+                } else {
+                    if (type && type.trim().toLowerCase() === item.productType.trim().toLowerCase()) {
+                        dataCollection.push(item);
+                    }
+                }
+            }
+        }
+        return res.status(200).json(dataCollection);
+    }).catch((err) => {
+        return res.status(500).json(err);
+    });
+});
+
 
 export default route
