@@ -6,27 +6,29 @@
     "moduleResolution": "node",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
+
     /* Paths & Base Resolution */
     "baseUrl": "./src",
     "paths": {
-      "config/*": [
-        "config/*"
-      ]
+      "config/*": ["config/*"]
     },
+
     /* Type checking */
     "strict": true,
     "skipLibCheck": true,
+
     /* Output settings */
-    "outDir": "./dist", // ✅ Add output directory
-    "rootDir": "./src", // ✅ Define source root (recommended)
-    "resolveJsonModule": true, // ✅ Optional: Allow importing .json files
-    "allowJs": true // ✅ Optional: Allow mixing JS with TS if needed
+    "outDir": "./dist",
+    "rootDir": ".", // ✅ rootDir should be the *common root* of all included files
+    "resolveJsonModule": true,
+    "allowJs": true
   },
   "include": [
-    "src"
-  ], // ✅ Only include source files
+    "index.ts",
+    "src/**/*"
+  ],
   "exclude": [
     "node_modules",
     "dist"
-  ] // ✅ Ignore build output and dependencies
+  ]
 }
