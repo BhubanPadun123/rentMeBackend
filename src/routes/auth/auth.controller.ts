@@ -8,7 +8,10 @@ import {
     createUser,
     loginUser,
     refreshAccessToken,
-    forgetPassword
+    forgetPassword,
+    GetUserById,
+    GetAllUser,
+    ChangeUserRole
 } from "../../services/auth.service"
 import {
     userTypeCheck,
@@ -36,6 +39,7 @@ route.post('/forget_password', (req: Request, res: Response) => {
         userEmail,
         password
     }
+    
     const validateData = forgetPasswordCheck.parse(data);
     forgetPassword(validateData).then((result) => {
         return res.status(200).json(result)
@@ -112,6 +116,53 @@ route.get('/privilages', (req: Request, res: Response) => {
         privillages: USER_PRIVILLAGES
     })
     return
+})
+route.get('/user',async(req:Request,res:Response)=>{
+    const body = req.query
+    const id = body.id as string
+    if(!id){
+        res.status(400).json({
+            message:"User id missing"
+        })
+        return
+    }
+    const user = await GetUserById(id)
+    if(user){
+        res.status(200).json({
+            userName:user?.userName,
+            userEmail:user?.userEmail,
+            userContactNumber:user?.userContactNumber,
+        })
+        return
+    }else{
+        res.status(500).json({
+            message:"user does not exist!"
+        })
+    }
+})
+route.get("/all",(req:Request,res:Response)=>{
+    GetAllUser().then((result)=>{
+        return res.status(200).json(result)
+    }).catch((err)=>{
+        return res.status(500).json(err)
+    })
+})
+route.put('/user',(req:Request,res:Response)=>{
+    const body =req.body
+    const id = body.id as string
+    const role = body.role as string
+    if(!id || !role){
+        res.status(400).json({
+            message:"id or role missing!"
+        })
+        return
+    }
+    ChangeUserRole(id,role).then((result)=>{
+        return res.status(200).json(result)
+    }).catch((err)=>{
+        return res.status(500).json(err)
+    })
+
 })
 route.use('/profile',verifyToken,updateProfile)
 

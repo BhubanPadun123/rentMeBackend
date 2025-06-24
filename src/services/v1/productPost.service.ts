@@ -58,9 +58,19 @@ export const BookingProperty = (data: BookingPayload) => {
     return new Promise(async (resolved, rejected) => {
         try {
             const validateData = BookingModelCheck.parse(data)
-            const newBooking = new BookingModel(validateData)
-            const saveNewBooking = await newBooking.save()
-            resolved(saveNewBooking)
+            const isCustomerBook = await BookingModel.findOne({
+                productRef: validateData.productRef,
+                customerRef: validateData.customerRef
+            })
+            if (isCustomerBook) {
+                rejected({
+                    message: "This property is already added to your cart!"
+                })
+            } else {
+                const newBooking = new BookingModel(validateData)
+                const saveNewBooking = await newBooking.save()
+                resolved(saveNewBooking)
+            }
         } catch (error) {
             rejected(error)
         }
@@ -79,17 +89,17 @@ export const GetVendorProduct = (id: string[]) => {
 export const GetOrderVendor = (vendorRef: string) => {
     return new Promise(async (resolved, rejected) => {
         try {
-            const list = await BookingModel.find({vendorRef: vendorRef })
+            const list = await BookingModel.find({ vendorRef: vendorRef })
             resolved(list)
         } catch (error) {
             rejected(error)
         }
     })
 }
-export const GetCustomerOrder =(customerRef:string)=>{
+export const GetCustomerOrder = (customerRef: string) => {
     return new Promise(async (resolved, rejected) => {
         try {
-            const list = await BookingModel.find({customerRef: customerRef })
+            const list = await BookingModel.find({ customerRef: customerRef })
             resolved(list)
         } catch (error) {
             rejected(error)
@@ -123,19 +133,19 @@ export const CheckProductAvailable = async (vendorRef: string, productRef: strin
     }
 }
 export const UpdateProductAvialableStatus = async (vendorRef: string, productRef: string) => {
-    return new Promise(async(resolved,rejected)=>{
+    return new Promise(async (resolved, rejected) => {
         try {
             const productData = await Product.findOneAndUpdate({
                 vendorRef,
-                _id:productRef
-            },{
-                $set:{
-                    availableStatus:false
+                _id: productRef
+            }, {
+                $set: {
+                    availableStatus: false
                 }
-            },{
-                new:false
+            }, {
+                new: false
             })
-            productData ? resolved(productData) : rejected({message:"product not found"})
+            productData ? resolved(productData) : rejected({ message: "product not found" })
         } catch (error) {
             console.log(error)
             rejected(error)
@@ -143,12 +153,12 @@ export const UpdateProductAvialableStatus = async (vendorRef: string, productRef
     })
 }
 export const UpdateBookingStatus = async (
-    bookingRef:string,
-    status:string
+    bookingRef: string,
+    status: string
 ) => {
     try {
         const updateData = await BookingModel.findOneAndUpdate({
-            _id:bookingRef
+            _id: bookingRef
         }, {
             $set: {
                 bookingStatus: status,
@@ -177,17 +187,17 @@ export const GetBookingProducts = (ids: string[]) => {
     })
 }
 
-export const updateMetaData=(pid:string,metaData:string)=>{
-    return new Promise(async(resolved,rejected)=>{
+export const updateMetaData = (pid: string, metaData: string) => {
+    return new Promise(async (resolved, rejected) => {
         try {
             const update = await Product.findOneAndUpdate({
-                _id:pid
-            },{
-                $set:{
-                    metaData:metaData
+                _id: pid
+            }, {
+                $set: {
+                    metaData: metaData
                 }
-            },{
-                new:false
+            }, {
+                new: false
             })
             resolved(update)
         } catch (error) {
@@ -196,10 +206,10 @@ export const updateMetaData=(pid:string,metaData:string)=>{
     })
 }
 
-export const GetVendorStock=(vendorRef:string)=>{
-    return new Promise(async(resolved,rejected)=>{
+export const GetVendorStock = (vendorRef: string) => {
+    return new Promise(async (resolved, rejected) => {
         try {
-            const list = await Product.find({vendorRef:vendorRef})
+            const list = await Product.find({ vendorRef: vendorRef })
             resolved(list)
         } catch (error) {
             rejected(error)
@@ -207,13 +217,13 @@ export const GetVendorStock=(vendorRef:string)=>{
     })
 }
 
-export const UpdateProduct=(productRef:string,data:ProductPayload)=>{
-    return new Promise(async(resolved,rejected)=>{
+export const UpdateProduct = (productRef: string, data: ProductPayload) => {
+    return new Promise(async (resolved, rejected) => {
         try {
             const updateData = await Product.findOneAndUpdate(
-                {_id:productRef},
+                { _id: productRef },
                 data,
-                {new:false}
+                { new: false }
             )
             resolved(updateData)
         } catch (error) {
@@ -221,8 +231,8 @@ export const UpdateProduct=(productRef:string,data:ProductPayload)=>{
         }
     })
 }
-export const DeleteProduct=(productRef:string)=>{
-    return new Promise(async(resolved,rejected)=>{
+export const DeleteProduct = (productRef: string) => {
+    return new Promise(async (resolved, rejected) => {
         try {
             const deleteProduct = await Product.findByIdAndDelete(productRef)
             resolved(deleteProduct)
@@ -232,8 +242,8 @@ export const DeleteProduct=(productRef:string)=>{
     })
 }
 
-export const FindAllProperty=()=>{
-    return new Promise(async(resolved,rejected)=>{
+export const FindAllProperty = () => {
+    return new Promise(async (resolved, rejected) => {
         try {
             const data = await Product.find({})
             resolved(data)

@@ -172,6 +172,40 @@ export const GetUserById=(uId:string):User | any=>{
         }
     })
 }
+export const GetAllUser=()=>{
+    return new Promise(async(resolved,rejeced)=>{
+        try {
+            const users = await UserModel.find({})
+            if(users){
+                resolved(users)
+            }else{
+                rejeced({
+                    message:"user list empty"
+                })
+            }
+        } catch (error) {
+            rejeced(error)
+        }
+    })
+}
+export const ChangeUserRole=(id:string,role:string)=>{
+    return new Promise(async(resolved,rejected)=>{
+        try {
+            const update = await UserModel.findByIdAndUpdate(id,{
+                userType:role
+            })
+            if(update){
+                resolved(update)
+            }else{
+                rejected({
+                    message:"update data not found!"
+                })
+            }
+        } catch (error) {
+            rejected(error)
+        }
+    })
+}
 
 
 

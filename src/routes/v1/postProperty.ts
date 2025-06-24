@@ -6,7 +6,8 @@ import express,{
 import dotenv from "dotenv"
 import { 
     productTypeCheck,
-    BookingModelCheck
+    BookingModelCheck,
+    NotificationModelCheck
 } from "../../types/product.type"
 import {
     checkUser 
@@ -43,16 +44,26 @@ route.post('/booking',async(req:Request,res:Response)=>{
         message:"__",
         bookingDate:bodyData.bookingDate
     }
-    const validateData = BookingModelCheck.parse(data)
-    BookingProperty(validateData).then((result)=>{
+    const validateBooking = BookingModelCheck.parse(data)
+    BookingProperty(validateBooking).then(async(result:any)=>{
         const notificationData:NotificationPayload={
-            userRef:data.vendorRef,
-            token:"__",
-            message:"Your property is booking some one.Please update the booking status",
+            userRef:result.customerRef,
+            token:getRandomColor(),
+            message:"You Booking has been place,We will notify you when it's update by owner",
             title:"New booking alert",
+            redirectLink:"ServiceBookingScreen" 
+        }
+        const vendorNotification:NotificationPayload={
+            userRef:result.vendorRef,
+            token:getRandomColor(),
+            message:"Someone is booking your propperty,Please update the status",
+            title:"New Booking Alert",
             redirectLink:"FeedBackScreen"
         }
-        CreateNotification(notificationData)
+        const validateNotification = NotificationModelCheck.parse(notificationData)
+        const validateNotificationVendor = NotificationModelCheck.parse(vendorNotification)
+        await CreateNotification(validateNotification)
+        await CreateNotification(validateNotificationVendor)
         return res.status(200).json(result)
     }).catch((error)=>{
         return res.status(501).json(error)
@@ -79,7 +90,6 @@ route.get('/list',async(req:Request,res:Response)=>{
 route.post('/add',async(req:Request,res:Response)=>{
     const body = req.body
     const validateData = productTypeCheck.parse(body);
-    console.log(validateData)
     checkUser(validateData.vendorRef).then((result_1)=>{
         const data:ProductPayload={
             vendorRef:validateData.vendorRef,
