@@ -27,6 +27,9 @@ import {
     bookingConfirmationPayloadCheck
 } from "../../types/vendor.type"
 import {
+    NotificationModelCheck
+} from "../../types/product.type"
+import {
     BookingPayload
 } from "../../model/stockBooking.model"
 import {
@@ -41,6 +44,9 @@ import {
     GetNotifications
 } from "../../services/v1/notification.service"
 import { NotificationPayload } from "../../model/notification"
+import {
+    getRandomColor
+} from "../../utils/randomColor"
 
 
 const router = Router()
@@ -118,6 +124,7 @@ router.put('/update_booking',async(req:Request,res:Response)=>{
         metaData
     } = req.body
 
+
     if(!bookingRef || !pid || !metaData){
         res.status(401).json({
             message:"mandatory data not provided!"
@@ -126,16 +133,17 @@ router.put('/update_booking',async(req:Request,res:Response)=>{
     }
     updateMetaData(pid,metaData).then(async(result:any)=>{
         const isUpdated = await UpdateBookingStatus(bookingRef,status)
-        if(isUpdated){
-            const customerRef = result.customerRef ? result.customerRef : ""
+        if(isUpdated && isUpdated.customerRef){
+            const customerRef = isUpdated.customerRef
             const notification:NotificationPayload={
                 userRef:customerRef,
-                token:"",
-                message:"Your booking property status were updated by owner",
+                token:getRandomColor(),
+                message:"Your booking status is updated by property owner",
                 title:"Booking property status update alert",
                 redirectLink:"ServiceBookingScreen"
             }
-            CreateNotification(notification)
+            const validateNotification = NotificationModelCheck.parse(notification)
+            await CreateNotification(validateNotification)
             res.status(200).json({
                 message:"status updated successfully!"
             })

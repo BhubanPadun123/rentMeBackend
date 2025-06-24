@@ -26,8 +26,6 @@ const mongooseUserSchema = new Schema<User>({
     userName:{
         type:String,
         required:true,
-        minlength:4,
-        maxlength:8
     },
     userEmail:{
         type:String,
@@ -37,8 +35,6 @@ const mongooseUserSchema = new Schema<User>({
     userContactNumber:{
         type:String,
         required:true,
-        min:10,
-        max:13,
         unique:true
     },
     userType:{
@@ -52,8 +48,6 @@ const mongooseUserSchema = new Schema<User>({
     password:{
         type:String,
         required:true,
-        min:6,
-        max:10
     },
     privillages:{type:[String],required:true},
     metaData:{type:Object,default:{}}

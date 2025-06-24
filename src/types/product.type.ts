@@ -29,9 +29,17 @@ const PaymentModelCheck=z.object({
     paymentStatus:z.string(),
     numberOfAttep:z.number()
 })
+const NotificationModelCheck=z.object({
+    userRef:z.string(),
+    token:z.string(),
+    message:z.string(),
+    title:z.string(),
+    redirectLink:string()
+})
 
 export {
     productTypeCheck,
     BookingModelCheck,
-    PaymentModelCheck
+    PaymentModelCheck,
+    NotificationModelCheck
 }

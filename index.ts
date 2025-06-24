@@ -10,6 +10,8 @@ import connectDB from "./src/config/db"
 // import Rconnect from "./src/config/radisConnect"
 import CustomerManage from "./src/routes/v1/customer"
 import dotenv from "dotenv"
+import {sendMailTypeCheck} from "./src/types/gmail.type"
+import {SendMail} from "./src/utils/communication/mail"
 
 dotenv.config()
 
