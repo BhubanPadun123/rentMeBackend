@@ -74,14 +74,15 @@ route.get('/list',async(req:Request,res:Response)=>{
     const param =  req.query
     const start = parseInt(param.start as string) || 0
     const end = parseInt(param.end as string) || 5
+    const tag = param.tag as string
 
-    if(end <= start){
+    if(end <= start || !tag){
         res.status(400).json({
             message:"pagination start should not greater or equal to end!!"
         })
         return
     }
-    GetProductList(start,end).then((result)=>{
+    GetProductList(start,end,tag).then((result)=>{
         return res.status(200).json(result)
     }).catch((err)=>{
         return res.status(500).json(err)
@@ -98,8 +99,8 @@ route.post('/add',async(req:Request,res:Response)=>{
             postAt:validateData.postAt,
             availableStatus:validateData.availableStatus,
             metaData:validateData.metaData,
-            propertyOccupancy:validateData.propertyOccupancy
-
+            propertyOccupancy:validateData.propertyOccupancy,
+            tag:validateData.tag
         }
         PostProduct(data).then((result_2)=>{
             return res.status(200).json(result_2)
@@ -134,8 +135,9 @@ route.get('/area', (req: Request, res: Response) => {
     const params = req.query;
     const town = params.town as string;
     const type = params.type as string;
+    const tag = params.tag as string
 
-    if (!town) {
+    if (!town || !tag) {
         res.status(500).json({
             message: "town missing",
         });
@@ -176,7 +178,8 @@ route.get('/area', (req: Request, res: Response) => {
                 }
             }
         }
-        return res.status(200).json(dataCollection);
+        const finalData = Array.isArray(dataCollection) ? dataCollection.filter((i)=> i.tag === tag) : []
+        return res.status(200).json(finalData);
     }).catch((err) => {
         return res.status(500).json(err);
     });

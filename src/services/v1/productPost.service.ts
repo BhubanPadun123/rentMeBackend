@@ -20,6 +20,7 @@ type images = {
 }
 export type ProductPayload = {
     vendorRef: string;
+    tag:string;
     productTitle: string;
     productType: string;
     postAt: string;
@@ -43,11 +44,11 @@ export const PostProduct = (data: ProductPayload) => {
     })
 }
 
-export const GetProductList = (start: number, end: number) => {
+export const GetProductList = (start: number, end: number,tag:string) => {
     return new Promise(async (resolved, rejected) => {
         try {
             const limit = end - start
-            const products = await Product.find().skip(start).limit(limit).exec()
+            const products = await Product.find({tag:tag}).skip(start).limit(limit).exec()
             resolved(products)
         } catch (error) {
             rejected(error)

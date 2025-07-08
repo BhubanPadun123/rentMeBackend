@@ -13,6 +13,7 @@ export interface ProductPayload extends Document {
     postAt: string;
     availableStatus: boolean;
     propertyOccupancy: string[];
+    tag:string;
     metaData: any;
 }
 
@@ -24,6 +25,7 @@ const ProductSchema = new Schema<ProductPayload>({
     postAt: { type: String, required: true },
     availableStatus: { type: Boolean, required: true },
     propertyOccupancy: { type: [String], required: true },
+    tag:{type:String,required:true},
     metaData: {type:Object}
 });
 
