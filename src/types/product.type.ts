@@ -7,7 +7,8 @@ const productTypeCheck = z.object({
     postAt:z.string(),
     availableStatus:z.boolean(),
     metaData:z.any(),
-    propertyOccupancy:z.array(z.string())
+    propertyOccupancy:z.array(z.string()),
+    tag:z.string()
 })
 
 const BookingModelCheck = z.object({
